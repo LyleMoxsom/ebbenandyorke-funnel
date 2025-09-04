@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Consultation - Ebben & Yorke</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --cream: #f8f6f0;
+            --sage: #9caf88;
+            --forest: #2d5016;
+            --charcoal: #2c2c2c;
+            --warm-white: #fefcf7;
+            --stone: #d4c5b9;
+            --copper: #b87333;
+            --muted-gold: #c9a961;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--warm-white);
+            background: var(--forest);
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.05)"/></svg>') repeat;
+            background-size: 60px 60px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Header/Navbar - Same as landing page without CTA */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(156,175,136,0.2);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-logo {
+            height: 35px;
+            width: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .header-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Spacer div to balance the header layout */
+        .header-spacer {
+            width: 200px; /* Approximate width of where button would be */
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            min-height: calc(100vh - 400px); /* Adjusted for footer */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Content Card */
+        .booking-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 50px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Typography */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 600;
+            color: var(--warm-white);
+            text-align: center;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--warm-white);
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        /* Calendar Container */
+        .calendar-container {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-height: 600px;
+            position: relative;
+        }
+        
+        .calendar-container iframe {
+            border-radius: 12px;
+            min-height: 600px;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(45, 80, 22, 0.1);
+            border-top: 3px solid var(--forest);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        /* Benefits List */
+        .benefits-list {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--warm-white);
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .tick {
+            color: #4CAF50;
+            font-size: 1.2em;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        /* Gold Divider */
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: var(--muted-gold);
+            margin: 2rem auto;
+            opacity: 0.8;
+        }
+        
+        /* Footer Text in Card */
+        .footer-text {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--warm-white);
+            opacity: 0.8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .footer-text a {
+            color: var(--muted-gold);
+            text-decoration: underline;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer-text a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Footer - Same as landing page */
+        .footer {
+            background: var(--charcoal);
+            color: var(--warm-white);
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .footer p {
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .footer-logo {
+            height: 60px;
+            width: auto;
+            margin: 0 auto 20px;
+            display: block;
+            filter: brightness(1.3) contrast(0.9);
+            opacity: 0.8;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                display: none; /* Hide header on mobile like landing page */
+            }
+            
+            .container {
+                padding: 0 20px;
+            }
+            
+            .main-content {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+            
+            .booking-card {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .benefits-list {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .calendar-container {
+                padding: 15px;
+                margin-top: 20px;
+            }
+            
+            .calendar-container iframe {
+                min-height: 500px;
+            }
+            
+            .footer-logo {
+                height: auto !important;
+                max-height: 45px !important;
+                max-width: 80% !important;
+                transform: none !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .subtitle {
+                font-size: 0.95rem;
+            }
+            
+            .benefit-item {
+                font-size: 0.9rem;
+            }
+            
+            .footer-logo {
+                max-width: 70% !important;
+                max-height: 40px !important;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .footer-logo {
+                max-width: 65% !important;
+                max-height: 35px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER/NAVBAR (Same as landing page without CTA) -->
+<header class="header">
+    <div class="header-content">
+        <img src="https://storage.googleapis.com/msgsndr/2y2XmPsJl1txt36sI8q3/media/68b6e9c90b29c21b8a045686.png" alt="Ebben & Yorke Logo" class="header-logo">
+        <div class="header-spacer"></div> <!-- Empty div to maintain layout balance -->
+    </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <div class="container">
+        <div class="booking-card">
+            <h1>Perfect! Now, Choose a Convenient Time for Your Free 10-Minute Phone Quote</h1>
+            
+            <div class="divider"></div>
+            
+            <p class="subtitle">
+                Our expert team will discuss your vision, answer your questions, and provide 
+                initial guidance on your perfect stove solution — all in just 10 minutes.
+            </p>
+            
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <span class="tick">✓</span>
+                    <span>Free consultation</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="tick">✓</span>
+                    <span>No obligation</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="tick">✓</span>
+                    <span>Expert guidance</span>
+                </div>
+            </div>
+            
+            <!-- Calendar Container -->
+            <div class="calendar-container">
+                <div class="loading-spinner"></div>
+                <iframe src="https://api.leadconnectorhq.com/widget/booking/aGC0HY3DyiPOWyNewt6h" 
+                        style="width: 100%;border:none;overflow: hidden;" 
+                        scrolling="no" 
+                        id="aGC0HY3DyiPOWyNewt6h_1756983207352"
+                        onload="this.style.opacity='1'; document.querySelector('.loading-spinner').style.display='none';"
+                        style="opacity: 0; transition: opacity 0.5s ease;">
+                </iframe>
+            </div>
+            
+            <p class="footer-text">
+                <strong>What happens next?</strong><br>
+                After booking, you'll receive a confirmation email with your consultation details. 
+                We'll call you at your chosen time to discuss your project and provide expert recommendations.<br><br>
+                
+                Need to reschedule? No problem – you can modify your booking anytime.<br><br>
+                
+                Questions? Call us directly on <strong>0121-308-0899</strong> or email 
+                <a href="mailto:office@ebbenandyorke.co.uk">office@ebbenandyorke.co.uk</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER - Same as landing page -->
+<footer class="footer">
+    <div class="container">
+        <img src="https://storage.googleapis.com/msgsndr/2y2XmPsJl1txt36sI8q3/media/68b6e9c90b29c21b8a045686.png" alt="Ebben & Yorke Logo" class="footer-logo">
+        <p><em>Premium Fireplace Artisans</em></p>
+        <p>Ebben & Yorke, 23 Mitchells, Weeford Road, Sutton Coldfield, B75 6NA</p>
+        <p>E: <a href="mailto:office@ebbenandyorke.co.uk" style="color: rgba(255,255,255,0.8); text-decoration: underline;">office@ebbenandyorke.co.uk</a> | T: 0121-308-0899</p>
+        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+            Follow us on Facebook & Instagram<br>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+                <a href="https://www.instagram.com/ebbenandyorke/" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; display: inline-flex; align-items: center; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+                <a href="https://www.facebook.com/ebbenandyorkestove/" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; display: inline-flex; align-items: center; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                </a>
+            </div>
+        </p>
+        <p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.6;">
+            Serving West Midlands, Staffordshire, Derbyshire & Leicestershire with distinction since 2007
+        </p>
+        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.5;">
+            © Copyright Ebben & Yorke Retail Ltd. 2021. All rights reserved. Ebben & Yorke Retail Ltd. Registered in England & Wales. Reg No: 06247899. Registered Office: 6 Parkside Court, Greenhough Road, Lichfield WS13 7AU. VAT No: 992 3019 11 | <a href="https://s3.privyr.com/privacy/privacy-policy.html?d=eyJlbWFpbCI6Im9mZmljZUBlYmJlbmFuZHlvcmtlLmNvLnVrIiwiY29tcGFueSI6IkViYmVuICYgWW9ya2UiLCJnZW5fYXQiOiIyMDI1LTA5LTAyVDIwOjE5OjAwLjAxNloifQ==" target="_blank" style="color: rgba(255,255,255,0.6); text-decoration: underline;">Privacy Policy</a>
+        </p>
+    </div>
+</footer>
+
+<script src="https://link.msgsndr.com/js/form_embed.js" type="text/javascript"></script>
+
+<script>
+// Header hide/show on scroll - same as landing page
+let lastScrollTop = 0;
+const header = document.querySelector('.header');
+
+window.addEventListener('scroll', () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Header hide/show functionality
+    if (scrollTop > lastScrollTop && scrollTop > 100) {
+        // Scrolling down & past 100px
+        if (header) header.classList.add('hidden');
+    } else if (scrollTop < lastScrollTop) {
+        // Scrolling up
+        if (header) header.classList.remove('hidden');
+    }
+    
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+}, false);
+
+// Fade in animation when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.style.opacity = '0';
+    document.body.style.transition = 'opacity 0.5s ease';
+    
+    setTimeout(() => {
+        document.body.style.opacity = '1';
+    }, 100);
+    
+    // Handle iframe load
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+        iframe.addEventListener('load', () => {
+            const spinner = document.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>
