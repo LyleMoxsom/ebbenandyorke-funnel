@@ -1232,7 +1232,7 @@
     <div class="header-content">
         <img src="https://storage.googleapis.com/msgsndr/2y2XmPsJl1txt36sI8q3/media/68bedacf966de820bc531bb1.png" alt="Ebben & Yorke Logo" class="header-logo">
         
-        <a href="#form" class="header-cta">
+        <a href="#form" class="header-cta" data-cta="header">
             Book My 10-Minute Phone Quote
             <span style="font-size: 1.1rem;">→</span>
         </a>
@@ -1256,7 +1256,7 @@
                 <div class="benefit-item"><span class="tick">✓</span> <strong>UK’s leading stockist of Britain’s finest stoves</strong></div>
             </div>
             
-            <a href="#form" class="cta-primary">
+            <a href="#form" class="cta-primary" data-cta="hero">
                 Book My 10-Minute Phone Quote
                 <span style="font-size: 1.2rem;">→</span>
             </a>
@@ -1333,7 +1333,7 @@
 </section>
 
 <!-- PACKAGES SECTION -->
-<section class="section">
+<section class="section" id="packages">
     <div class="container">
         <h2 class="fade-in">Three Bespoke Solutions</h2>
         <p class="section-subtitle fade-in">Each installation tailored to your home's character and your family's needs</p>
@@ -1393,7 +1393,7 @@
         </div>
         
         <div style="text-align: center; margin-top: 50px;">
-            <a href="#form" class="cta-primary">
+            <a href="#form" class="cta-primary" data-cta="process">
                 Book My 10-Minute Phone Quote
                 <span style="font-size: 1.2rem;">→</span>
             </a>
@@ -1460,7 +1460,7 @@
 </section>
 
 <!-- TESTIMONIALS SECTION -->
-<section class="section">
+<section class="section" id="testimonials">
     <div class="container">
         <h2 class="fade-in">In Their Own Words</h2>
         <p class="section-subtitle fade-in">Real experiences from homeowners who trusted us with their fireplace dreams</p>
@@ -1490,7 +1490,7 @@
         </div>
         
         <div style="text-align: center; margin-top: 50px;">
-            <a href="#form" class="cta-primary">
+            <a href="#form" class="cta-primary" data-cta="testimonial">
                 Book My 10-Minute Phone Quote
                 <span style="font-size: 1.2rem;">→</span>
             </a>
@@ -1553,7 +1553,7 @@
 </section>
 
 <!-- WHY DIFFERENT SECTION -->
-<section class="section">
+<section class="section" id="comparison">
     <div class="container">
         <h2 class="fade-in">The Distinction of True Craftsmanship</h2>
         <p class="section-subtitle fade-in">Understanding the difference between a complete solution and empty promises</p>
@@ -1696,6 +1696,7 @@ const observer = new IntersectionObserver((entries) => {
 // Header hide/show on scroll and parallax effect
 let lastScrollTop = 0;
 const header = document.querySelector('.header');
+let autoScrolling = false;
 
 window.addEventListener('scroll', () => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -1737,7 +1738,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
+
+    const ctaButtons = document.querySelectorAll('.header-cta, .cta-primary');
+    ctaButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            autoScrolling = true;
+            const ctaName = btn.dataset.cta || 'unknown';
+            fbq('trackCustom', 'cta_click', {button: ctaName});
+            setTimeout(() => { autoScrolling = false; }, 1200);
+        }, {capture: true});
+    });
+
+    const sectionsToTrack = [
+        {id: 'packages', event: 'packages_view'},
+        {id: 'testimonials', event: 'testimonials_view'},
+        {id: 'comparison', event: 'comparison_view'}
+    ];
+
+    const sectionObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                if (!autoScrolling) {
+                    fbq('trackCustom', entry.target.dataset.event);
+                    obs.unobserve(entry.target);
+                }
+            }
+        });
+    }, {threshold: 0.5});
+
+    sectionsToTrack.forEach(({id, event}) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.dataset.event = event;
+            sectionObserver.observe(el);
+        }
+    });
+
     // Form enhancement
     const formInputs = document.querySelectorAll('input, select, textarea');
     formInputs.forEach(input => {
