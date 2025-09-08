@@ -234,11 +234,14 @@
             gap: 8px;
         }
         
-        .tick {
-            color: #4CAF50;
-            font-size: 1.3em;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        .bullet {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: var(--muted-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0,0,0,0.6);
+            flex-shrink: 0;
         }
         
         .benefit-item:last-child {
@@ -1250,10 +1253,10 @@
             <h1>Discover Your Perfect Stove Installation with A Free 10-Minute Phone Quote</h1>
             
             <div class="hero-benefits">
-                <div class="benefit-item"><span class="tick">✓</span> <strong>18-Year Local Reputation</strong></div>
-                <div class="benefit-item"><span class="tick">✓</span> <strong>Complete Pricing Transparency</strong></div>
-                <div class="benefit-item"><span class="tick">✓</span> <strong>HETAS certified master engineers</strong></div>
-                <div class="benefit-item"><span class="tick">✓</span> <strong>UK’s leading stockist of Britain’s finest stoves</strong></div>
+                <div class="benefit-item"><span class="bullet"></span> <strong>18-Year Local Reputation</strong></div>
+                <div class="benefit-item"><span class="bullet"></span> <strong>Complete Pricing Transparency</strong></div>
+                <div class="benefit-item"><span class="bullet"></span> <strong>HETAS certified master engineers</strong></div>
+                <div class="benefit-item"><span class="bullet"></span> <strong>UK’s leading stockist of Britain’s finest stoves</strong></div>
             </div>
             
             <a href="#form" class="cta-primary">
