@@ -1839,26 +1839,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 console.log('Request sent successfully');
                 
-                // Since we're using no-cors, we can't check the response
-                // Show success message
-                submitBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
-                submitBtn.innerHTML = 'Success! ✓';
-                
-                // Show success message below button
-                const successMsg = document.createElement('p');
-                successMsg.style.cssText = 'color: #27ae60; text-align: center; margin-top: 20px; font-size: 1.1rem; font-weight: 600;';
-                successMsg.textContent = 'Thank you! We\'ll call you shortly to schedule your consultation.';
-                submitBtn.parentElement.appendChild(successMsg);
-                
-                // Reset form after 5 seconds
-                setTimeout(() => {
-                    leadForm.reset();
-                    submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
-                    submitBtn.style.background = '';
-                    submitBtn.innerHTML = originalBtnText;
-                    successMsg.remove();
-                }, 5000);
+                // Redirect to calendar page after successful submission
+                window.location.href = 'Calendar.html';
                 
             } catch (error) {
                 console.error('Webhook error:', error);
