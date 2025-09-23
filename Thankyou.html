@@ -17,7 +17,6 @@
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1202717601883540');
     fbq('track', 'PageView');
-    fbq('trackCustom', 'schedule');
     </script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1202717601883540&ev=PageView&noscript=1"
@@ -645,23 +644,46 @@ window.addEventListener('scroll', () => {
 
 // Fade in animation when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    MetaTracking.collectAttributionData();
-    MetaTracking.sendCapiEvent('Schedule', {
-        eventIdSuffix: '-schedule',
-        eventKey: 'schedule_thankyou',
-        eventSourceUrl: window.location.href
-    }).finally(() => {
-        MetaTracking.clearLeadSubmission();
-    });
+    const metaTrackingAvailable = typeof MetaTracking !== 'undefined';
+    let scheduleEventId = null;
+
+    if (metaTrackingAvailable) {
+        MetaTracking.collectAttributionData();
+        const storedLead = MetaTracking.getStoredLeadSubmission();
+        if (storedLead && storedLead.meta_event_id) {
+            scheduleEventId = `${storedLead.meta_event_id}-schedule`;
+        }
+    }
+
+    if (typeof fbq === 'function') {
+        try {
+            if (scheduleEventId) {
+                fbq('track', 'Schedule', { eventID: scheduleEventId });
+            } else {
+                fbq('track', 'Schedule');
+            }
+        } catch (fbError) {
+            console.warn('Failed to send Schedule event to Meta Pixel', fbError);
+        }
+    }
+
+    if (metaTrackingAvailable) {
+        MetaTracking.sendCapiEvent('Schedule', {
+            eventIdSuffix: '-schedule',
+            eventKey: 'schedule_thankyou',
+            eventSourceUrl: window.location.href
+        }).finally(() => {
+            MetaTracking.clearLeadSubmission();
+        });
+    }
 
     document.body.style.opacity = '0';
     document.body.style.transition = 'opacity 0.5s ease';
-    
+
     setTimeout(() => {
         document.body.style.opacity = '1';
     }, 100);
-    
-    // Add calendar reminder if supported
+
     if ('Notification' in window && Notification.permission === 'default') {
         // You could ask for notification permission here if needed
     }
