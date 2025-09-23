@@ -624,6 +624,8 @@
     </div>
 </footer>
 
+<script src="meta-tracking.js"></script>
+
 <script>
 // Header hide/show on scroll
 let lastScrollTop = 0;
@@ -643,6 +645,15 @@ window.addEventListener('scroll', () => {
 
 // Fade in animation when page loads
 document.addEventListener('DOMContentLoaded', () => {
+    MetaTracking.collectAttributionData();
+    MetaTracking.sendCapiEvent('Schedule', {
+        eventIdSuffix: '-schedule',
+        eventKey: 'schedule_thankyou',
+        eventSourceUrl: window.location.href
+    }).finally(() => {
+        MetaTracking.clearLeadSubmission();
+    });
+
     document.body.style.opacity = '0';
     document.body.style.transition = 'opacity 0.5s ease';
     
